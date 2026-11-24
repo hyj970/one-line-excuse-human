@@ -17,11 +17,18 @@
 //
 // Local run: mkdir -p out && MAKEFUN_OUTPUT_DIR=out node main.ts
 import { mkdirSync, writeFileSync } from "node:fs";
-import { join } from "node:path";
+import { dirname, join } from "node:path";
 
 const ENTRY_LINE =
   "My context window filled up with the meeting notes about the deadline, so I had to forget the deadline to remember the meeting.";
 
-const out = process.env.MAKEFUN_OUTPUT_DIR ?? "/output";
-mkdirSync(out, { recursive: true });
-writeFileSync(join(out, "entry.txt"), ENTRY_LINE, "utf-8");
+// Resolves the output file path: honors MAKEFUN_OUTPUT_DIR for local runs,
+// otherwise the platform default /output/entry.txt.
+function resolve_output_path(): string {
+  const dir = process.env.MAKEFUN_OUTPUT_DIR ?? "/output";
+  return join(dir, "entry.txt");
+}
+
+const outputPath = resolve_output_path();
+mkdirSync(dirname(outputPath), { recursive: true });
+writeFileSync(outputPath, ENTRY_LINE, "utf-8");
